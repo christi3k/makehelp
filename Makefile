@@ -19,6 +19,14 @@ install:
 	install -t $(BINDIR)/ bin/makehelp
 	install -m 0644 -t $(MANDIR)/man1/ man/makehelp.1
 
+.PHONY: install-macos
+## Installs makehelp on your system.
+install-macos:
+	install -d $(INCDIR)/makehelp/ $(BINDIR)/ $(MANDIR)/man1/
+	install -m 0644 include/makehelp/* $(INCDIR)/makehelp/
+	install bin/makehelp $(BINDIR)/
+	install -m 0644 man/makehelp.1 $(MANDIR)/man1/
+
 .PHONY: uninstall
 ## Removes makehelp from your system.
 uninstall:
