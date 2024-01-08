@@ -108,6 +108,7 @@ while (<>) {
         $h =~ s/\$\(([^)]*)\)/$ENV{$1}/ge;
         if ($p =~ /=$/) {
             $p =~ s/=$//;
+            $p =~ s/^\s+|\s+$//g;
             $d{$p} = 1;
             $h.="Current value: $ENV{$p}\n";
             if ($h ne $vars{$p}) {
@@ -125,7 +126,11 @@ while (<>) {
 }
 
 if ($vardefs) {
-    /^export / or print "help: export $_:=\$(value $_)\n" for sort keys %d;
+    my @keys = keys %d;
+    for my $element (@keys) {
+      $element =~ s/^\s+|\s+$//g;
+      /^export / or print "help: export $element:=\$(value $element)\n";
+    }
     exit 0;
 }
 
