@@ -11,7 +11,7 @@
 # # This is the default target.
 # all: ...
 
-$version = "1.5";
+$version = "1.5.1";
 
 sub changelog() {
     print <<END;
@@ -94,19 +94,32 @@ while ($_ = shift) {
 @ARGV = @RealArgs;
 
 while (<>) {
-    if (/^## .*$/ ... /^([^.#\t][^:=]*:([^=]|$)|([^.#\t][^:=?]*(\?=|:=|=))|$)/) {
+    # p = parameter?
+    # h = help text?
+    # makes use of the ... flip-flop operator
+    # once the operator flips to true, then it won’t check the right-hand operand until the next iteration
+    if (/^## .*$/ ... /^([^#\t][^:=]*:([^=]|$)|([^#\t][^:=?]*(\?=|:=|=))|$)/) {
+        # remove leading hashes
         s/^##? ?//;
+        # set help text to param?
         $h .= $p;
+        # set param to match?
         $p = $_;
     } elsif ($h) {
         $p =~ s/^export //;
         $p =~ s/(\?=|:=|=).*/=/;
+        # grab prereqendencies
+        $prereq = $p;
+        $prereq =~ /(^\.*[A-Za-z0-9-\.\/]+:)(\s)(.*)$/;
+        $prereq = $3;
+        $prereq =~ s/^\s+|\s+$//g;
         $p =~ s/:.*/:/;
         chomp $p;
         $d{$1} = 1 while $h =~ /\$\(([^)]*)\)/g;
         $p =~ s/\$\(([^)]*)\)/$ENV{$1}/ge;
         $h =~ s/\$\(([^)]*)\)/$ENV{$1}/ge;
         if ($p =~ /=$/) {
+            # most likely a variable
             $p =~ s/=$//;
             $p =~ s/^\s+|\s+$//g;
             $d{$p} = 1;
@@ -115,9 +128,16 @@ while (<>) {
                 $vars{$p} .= $h;
             }
         } else {
+            # looks like a goal
             $p =~ s/:$//;
-            if ($h ne $goals{$p}) {
-                $goals{$p} .= $h;
+            $h =~ s/^\s+|\s+$//g;
+            if ( $prereq ne "" ) {
+              $helper = $h . " [prerequisites: $prereq]\n";
+            } else {
+              $helper = "$h\n";
+            }
+            if ($helper ne $goals{$p}) {
+                $goals{$p} .= "$helper";
             }
         }
         undef $h;
@@ -160,11 +180,11 @@ END
     for (sort keys %vars) {
         $vars{$_} =~ s/^/$indent/gm;
         if (length > 16) {
-            print "  $_\n$vars{$_}";
+            print "  $_:\n$vars{$_}";
         } else {
-            $tmpIndent = " " x (2 + length);
+            $tmpIndent = " " x (3 + length);
             $vars{$_} =~ s/^$tmpIndent//;
-            print "  $_$vars{$_}";
+            print "  $_:$vars{$_}";
         }
     }
 }
@@ -177,10 +197,10 @@ END
 for (sort keys %goals) {
     $goals{$_} =~ s/^/$indent/gm;
     if (length > 16) {
-        print "  $_\n$goals{$_}";
+        print "  $_:\n$goals{$_}\n";
     } else {
-        $tmpIndent = " " x (2 + length);
+        $tmpIndent = " " x (3 + length);
         $goals{$_} =~ s/^$tmpIndent//;
-        print "  $_$goals{$_}";
+        print "  $_:$goals{$_}\n";
     }
 }
