@@ -96,12 +96,19 @@ while ($_ = shift) {
 while (<>) {
     # p = parameter (variable or target/rule)
     # h = help text
-    if (/^## .*$/){
+    if (/^# Description:.*$/){
+        # this is the description for the whole file
+        # remove leading hashes
+        s/^# Description: //;
+        # init desc text
+        $desc .= $ARGV . ": ". $_;
+    }
+    elsif (/^# .*$/){
         ## this is comment/helper line
         # remove leading hashes
-        s/^##? ?//;
+        s/^#? ?//;
         # init helper text
-        $h = $_;
+        $h .= $_;
     }
     elsif (/^\s*$/) {
         # empty line; do nothing
@@ -173,6 +180,10 @@ Popular make OPTIONs:
   -h    Print make help text.
 Use option -h to lists the GNUmake part of the help.
 END
+
+if ($desc){
+  print "\n$desc";
+}
 
 my $indent = " " x 20;
 if (%vars) {
