@@ -94,21 +94,25 @@ while ($_ = shift) {
 @ARGV = @RealArgs;
 
 while (<>) {
-    # p = parameter?
-    # h = help text?
-    # makes use of the ... flip-flop operator
-    # once the operator flips to true, then it won’t check the right-hand operand until the next iteration
-    if (/^## .*$/ ... /^([^#\t][^:=]*:([^=]|$)|([^#\t][^:=?]*(\?=|:=|=))|$)/) {
+    # p = parameter (variable or target/rule)
+    # h = help text
+    if (/^## .*$/){
+        ## this is comment/helper line
         # remove leading hashes
         s/^##? ?//;
-        # set help text to param?
-        $h .= $p;
-        # set param to match?
+        # init helper text
+        $h = $_;
+    }
+    elsif (/^\s*$/) {
+        # empty line; do nothing
+    }
+    elsif (/^([^.#\t][^:=]*:([^=]|$)|([^.#\t][^:=?]*(\?=|:=|=))|$)/ && $h) {
+        ## this is an assignment or a rule AND we have helper text for it
+        ## init rule or var
         $p = $_;
-    } elsif ($h) {
         $p =~ s/^export //;
         $p =~ s/(\?=|:=|=).*/=/;
-        # grab prereqendencies
+        # grab prerequisites
         $prereq = $p;
         $prereq =~ /(^\.*[A-Za-z0-9-\.\/]+:)(\s)(.*)$/;
         $prereq = $3;
@@ -121,6 +125,7 @@ while (<>) {
         if ($p =~ /=$/) {
             # most likely a variable
             $p =~ s/=$//;
+            $p =~ s/^\s+|\s+$//g;
             $p =~ s/^\s+|\s+$//g;
             $d{$p} = 1;
             $h.="Current value: $ENV{$p}\n";
