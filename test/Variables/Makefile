@@ -1,38 +1,38 @@
 UNEXPORTED_CONDITIONAL_DEFINED=unexported conditional defined
 export EXPORTED_CONDITIONAL_DEFINED=exported conditional defined
 
-## Unexported recursively expanded variable.
+# Unexported recursively expanded variable.
 UNEXPORTED_EXPANDED=unexported expanded
 
-## Unexported simple variable.
+# Unexported simple variable.
 UNEXPORTED_SIMPLE:=unexported simple
 
-## Exported recursively expanded variable.
+# Exported recursively expanded variable.
 export EXPORTED_EXPANDED=exported expanded
 
-## Exported simple variable.
+# Exported simple variable.
 export EXPORTED_SIMPLE=exported simple
 
-## Unexported conditional defined variable.
+# Unexported conditional defined variable.
 UNEXPORTED_CONDITIONAL_DEFINED?=unexported conditional redefined
 
-## Exported conditional defined variable.
+# Exported conditional defined variable.
 export EXPORTED_CONDITIONAL_DEFINED?=exported conditional redefined
 
-## Unexported recursive variable defined with spaces
+# Unexported recursive variable defined with spaces
 UNEXPORTED_RECURSIVE_WITH_SPACES := unexported recursive with spaces
 
-## Exported recursive variable defined with spaces
+# Exported recursive variable defined with spaces
 export EXPORTED_RECURSIVE_WITH_SPACES := exported recursive with spaces
 
-## Unexported simple variable defined with spaces
+# Unexported simple variable defined with spaces
 UNEXPORTED_SIMPLE_WITH_SPACES := unexported simple with spaces
 
-## Exported simple variable defined with spaces
+# Exported simple variable defined with spaces
 export EXPORTED_SIMPLE_WITH_SPACES := exported simple with spaces
 
 .PHONY: test
-## Runs this Makefile as a test.
+# Runs this Makefile as a test.
 # This Makefile tests that all flavors of variables are properly expanded in the help text.
 # This requires that unexported variables are exported for the help: make goal.
 test: help.txt

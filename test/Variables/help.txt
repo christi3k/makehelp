@@ -13,38 +13,41 @@ Use option -h to lists the GNUmake part of the help.
 
 A VARIABLE is specified as name=value pair.
 Supported VARIABLEs:
-  EXPORTED_CONDITIONAL_DEFINED
+  EXPORTED_CONDITIONAL_DEFINED:
                     Exported conditional defined variable.
                     Current value: exported conditional defined
-  EXPORTED_EXPANDED
+  EXPORTED_EXPANDED:
                     Exported recursively expanded variable.
                     Current value: exported expanded
-  EXPORTED_RECURSIVE_WITH_SPACES
+  EXPORTED_RECURSIVE_WITH_SPACES:
                     Exported recursive variable defined with spaces
                     Current value: exported recursive with spaces
-  EXPORTED_SIMPLE   Exported simple variable.
+  EXPORTED_SIMPLE:  Exported simple variable.
                     Current value: exported simple
-  EXPORTED_SIMPLE_WITH_SPACES
+  EXPORTED_SIMPLE_WITH_SPACES:
                     Exported simple variable defined with spaces
                     Current value: exported simple with spaces
-  UNEXPORTED_CONDITIONAL_DEFINED
+  UNEXPORTED_CONDITIONAL_DEFINED:
                     Unexported conditional defined variable.
                     Current value: unexported conditional defined
-  UNEXPORTED_EXPANDED
+  UNEXPORTED_EXPANDED:
                     Unexported recursively expanded variable.
                     Current value: unexported expanded
-  UNEXPORTED_RECURSIVE_WITH_SPACES
+  UNEXPORTED_RECURSIVE_WITH_SPACES:
                     Unexported recursive variable defined with spaces
                     Current value: unexported recursive with spaces
-  UNEXPORTED_SIMPLE
+  UNEXPORTED_SIMPLE:
                     Unexported simple variable.
                     Current value: unexported simple
-  UNEXPORTED_SIMPLE_WITH_SPACES
+  UNEXPORTED_SIMPLE_WITH_SPACES:
                     Unexported simple variable defined with spaces
                     Current value: unexported simple with spaces
 
 Supported GOALs:
-  help              Prints this help message.
-  test              Runs this Makefile as a test.
+  help:             File to include from your Makefile like this:
+                    -include makehelp/Help.mk
+
+  test:             Runs this Makefile as a test.
                     This Makefile tests that all flavors of variables are properly expanded in the help text.
-                    This requires that unexported variables are exported for the help: make goal.
+                    This requires that unexported variables are exported for the help: make goal. [prerequisites: help.txt]
+
