@@ -2,6 +2,20 @@
 
 <div style="font-size: 150%; font-weight: bold; text-align: center;">! Doxygen (sort of) for GNU make !</div>
 
+"Sort of" in that `makehelp` generates text to screen based on in-line comments. It does not generate other kinds of documentation (e.g. html). It works best interactively on the command line like you might use `man` or `info`.
+
+**Note:** This is forked and modified version of the original [christianhujer/makehelp](https://github.com/christianhujer/makehelp) by Christian Hujer. Thank you Christian! I ended up making changes that I'm not sure are compatible with Christian's vision. If I have time, I'll figure out which make sense to submit as PRs upstream. In the meantime, I'm sharing them here in case they are useful for anyone.
+
+Changes from the upstream version:
+
+- Changed comment style to single hash only `#`.
+- Enabled support for single spacing.
+- Update variable parsing to support spaces around assignment.
+- Added display of prerequisites to GOALs listing.
+- Made some minor formatting changes to improve readability.
+- Added target for installing on macOS (this could be improved).
+- Added support for a `Description` comment at the top to explain the purpose of the makefile.
+
 ## What is `makehelp`?
 `makehelp.pl` is a Makefile and a Perl script which provide built-in doxygen-style help in `Makefile`s.
 Special comments in the `Makefile` are used to provide user documentation for goals and variables.
@@ -16,7 +30,7 @@ To use `makehelp` in your project without installing it, append the following li
 
 ifeq "help" "$(filter help,$(MAKECMDGOALS))"
 .makehelp/include/makehelp/Help.mk:
-	git clone --depth=1 https://github.com/christianhujer/makehelp.git .makehelp
+	git clone --depth=1 https://github.com/christi3k/makehelp.git .makehelp
 endif
 ~~~~
 
@@ -56,7 +70,7 @@ Included makefiles are supported.
 #### Example for a variable documentation
 
 ~~~~make
-## The prefix path for installation.
+# The prefix path for installation.
 # Unless overridden individually, other installation paths are derived from this.
 PREFIX:=/usr/local/
 ~~~~
@@ -65,31 +79,33 @@ PREFIX:=/usr/local/
 
 ~~~~make
 .PHONY: all
-## Builds everything.
+# Builds everything.
 all: hello
 ~~~~
 
 #### Sample Makefile
 
 ~~~~make
-## The prefix path for installation.
+# Description: Sample makefile.
+
+# The prefix path for installation.
 # Unless overridden individually, other installation paths are derived from this.
 PREFIX:=/usr/local/
 
-## The path to install binary files.
+# The path to install binary files.
 BINDIR=$(PREFIX)bin/
 
 .PHONY: all
-## Builds everything.
+# Builds everything.
 all: hello
 
 .PHONY: clean
-## Removes generated files.
+# Removes generated files.
 clean::
 	$(RM) hello hello.o
 
 .PHONY: install
-## Installs the binary program to $(BINDIR).
+# Installs the binary program to $(BINDIR).
 # On most systems, this needs to be run as root, i.e. using sudo.
 install: all
 	install -d $(BINDIR) hello
@@ -112,6 +128,8 @@ Popular make OPTIONs:
   -q    Run no commands; exit status says if up to date.
   -h    Print make help text.
 Use option -h to lists the GNUmake part of the help.
+
+Makefile: Sample makefile.
 
 A VARIABLE is specified as name=value pair.
 Supported VARIABLEs:
@@ -137,22 +155,22 @@ While `makehelp` is designed to be lightweight, some might consider it still "to
 If you believe that `makehelp` is still too heavy, you could try using `sed` instead, like this:
 
 ~~~~make
-## My little Makefile
-##
+# My little Makefile
+#
 
 .PHONY: all
-## all: Builds the hello, world application.
+# all: Builds the hello, world application.
 all: hello
 
 .PHONY: clean
-## clean: Removes all auto-generated files.
+# clean: Removes all auto-generated files.
 clean::
 	$(RM) hello *.[adios]
 
 .PHONY: help
-## help: Prints this help text.
+# help: Prints this help text.
 help:
-	sed -n 's/^## \?//p' $(MAKEFILE_LIST)
+	sed -n 's/^# \?//p' $(MAKEFILE_LIST)
 
 ##
 ## Questions? Send an email to <…@…>
