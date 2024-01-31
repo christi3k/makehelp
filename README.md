@@ -13,7 +13,7 @@ Changes from the upstream version:
 - Update variable parsing to support spaces around assignment.
 - Added display of prerequisites to GOALs listing.
 - Made some minor formatting changes to improve readability.
-- Added target for installing on macOS (this could be improved).
+- Updated `install` target to support macOS (tested on macOS Sonoma 14.2).
 - Added support for a `Description` comment at the top to explain the purpose of the makefile.
 
 ## What is `makehelp`?

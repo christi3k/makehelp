@@ -1,34 +1,38 @@
-## Installation prefix.
+# Description: Install `makehelp`.
+
+# Target operating system.
+UNAME:=$(shell uname)
+
+# Installation prefix.
 # Defaults to /usr/local/.
-PREFIX:=/usr/local/
+PREFIX:=/usr/local
 
-## Installation directory for binaries.
-BINDIR=$(PREFIX)/bin/
+# Installation directory for binaries.
+BINDIR=$(PREFIX)/bin
 
-## Installation directory for include files.
-INCDIR=$(PREFIX)/include/
+# Installation directory for include files.
+INCDIR=$(PREFIX)/include
 
-## Installation directory for man files.
-MANDIR=$(PREFIX)/share/man/
+# Installation directory for man files.
+MANDIR=$(PREFIX)/share/man
 
 .PHONY: install
-## Installs makehelp on your system.
+# Installs makehelp on your system.
 install:
-	install -d $(INCDIR)/makehelp/ $(BINDIR)/ $(MANDIR)/man1/
-	install -m 0644 -t $(INCDIR)/makehelp/ include/makehelp/*
-	install -t $(BINDIR)/ bin/makehelp
-	install -m 0644 -t $(MANDIR)/man1/ man/makehelp.1
-
-.PHONY: install-macos
-## Installs makehelp on your system.
-install-macos:
+ifeq ($(UNAME),Darwin)
 	install -d $(INCDIR)/makehelp/ $(BINDIR)/ $(MANDIR)/man1/
 	install -m 0644 include/makehelp/* $(INCDIR)/makehelp/
 	install bin/makehelp $(BINDIR)/
 	install -m 0644 man/makehelp.1 $(MANDIR)/man1/
+else
+	install -d $(INCDIR)/makehelp/ $(BINDIR)/ $(MANDIR)/man1/
+	install -m 0644 -t $(INCDIR)/makehelp/ include/makehelp/*
+	install -t $(BINDIR)/ bin/makehelp
+	install -m 0644 -t $(MANDIR)/man1/ man/makehelp.1
+endif
 
 .PHONY: uninstall
-## Removes makehelp from your system.
+# Removes makehelp from your system.
 uninstall:
 	$(RM) -r $(INCDIR)/makehelp/ $(BINDIR)/makehelp
 
