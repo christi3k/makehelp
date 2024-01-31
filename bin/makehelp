@@ -11,7 +11,7 @@
 # # This is the default target.
 # all: ...
 
-$version = "1.5";
+$version = "1.5.1";
 
 sub changelog() {
     print <<END;
@@ -94,29 +94,62 @@ while ($_ = shift) {
 @ARGV = @RealArgs;
 
 while (<>) {
-    if (/^## .*$/ ... /^([^.#\t][^:=]*:([^=]|$)|([^.#\t][^:=?]*(\?=|:=|=))|$)/) {
-        s/^##? ?//;
-        $h .= $p;
+    # p = parameter (variable or target/rule)
+    # h = help text
+    if (/^# Description:.*$/){
+        # this is the description for the whole file
+        # remove leading hashes
+        s/^# Description: //;
+        # init desc text
+        $desc .= $ARGV . ": ". $_;
+    }
+    elsif (/^# .*$/){
+        ## this is comment/helper line
+        # remove leading hashes
+        s/^#? ?//;
+        # init helper text
+        $h .= $_;
+    }
+    elsif (/^\s*$/) {
+        # empty line; do nothing
+    }
+    elsif (/^([^.#\t][^:=]*:([^=]|$)|([^.#\t][^:=?]*(\?=|:=|=))|$)/ && $h) {
+        ## this is an assignment or a rule AND we have helper text for it
+        ## init rule or var
         $p = $_;
-    } elsif ($h) {
         $p =~ s/^export //;
         $p =~ s/(\?=|:=|=).*/=/;
+        # grab prerequisites
+        $prereq = $p;
+        $prereq =~ /(^\.*[A-Za-z0-9-\.\/]+:)(\s)(.*)$/;
+        $prereq = $3;
+        $prereq =~ s/^\s+|\s+$//g;
         $p =~ s/:.*/:/;
         chomp $p;
         $d{$1} = 1 while $h =~ /\$\(([^)]*)\)/g;
         $p =~ s/\$\(([^)]*)\)/$ENV{$1}/ge;
         $h =~ s/\$\(([^)]*)\)/$ENV{$1}/ge;
         if ($p =~ /=$/) {
+            # most likely a variable
             $p =~ s/=$//;
+            $p =~ s/^\s+|\s+$//g;
+            $p =~ s/^\s+|\s+$//g;
             $d{$p} = 1;
             $h.="Current value: $ENV{$p}\n";
             if ($h ne $vars{$p}) {
                 $vars{$p} .= $h;
             }
         } else {
+            # looks like a goal
             $p =~ s/:$//;
-            if ($h ne $goals{$p}) {
-                $goals{$p} .= $h;
+            $h =~ s/^\s+|\s+$//g;
+            if ( $prereq ne "" ) {
+              $helper = $h . " [prerequisites: $prereq]\n";
+            } else {
+              $helper = "$h\n";
+            }
+            if ($helper ne $goals{$p}) {
+                $goals{$p} .= "$helper";
             }
         }
         undef $h;
@@ -125,7 +158,11 @@ while (<>) {
 }
 
 if ($vardefs) {
-    /^export / or print "help: export $_:=\$(value $_)\n" for sort keys %d;
+    my @keys = keys %d;
+    for my $element (@keys) {
+      $element =~ s/^\s+|\s+$//g;
+      /^export / or print "help: export $element:=\$(value $element)\n";
+    }
     exit 0;
 }
 
@@ -144,6 +181,10 @@ Popular make OPTIONs:
 Use option -h to lists the GNUmake part of the help.
 END
 
+if ($desc){
+  print "\n$desc";
+}
+
 my $indent = " " x 20;
 if (%vars) {
     print <<END;
@@ -155,11 +196,11 @@ END
     for (sort keys %vars) {
         $vars{$_} =~ s/^/$indent/gm;
         if (length > 16) {
-            print "  $_\n$vars{$_}";
+            print "  $_:\n$vars{$_}";
         } else {
-            $tmpIndent = " " x (2 + length);
+            $tmpIndent = " " x (3 + length);
             $vars{$_} =~ s/^$tmpIndent//;
-            print "  $_$vars{$_}";
+            print "  $_:$vars{$_}";
         }
     }
 }
@@ -172,10 +213,10 @@ END
 for (sort keys %goals) {
     $goals{$_} =~ s/^/$indent/gm;
     if (length > 16) {
-        print "  $_\n$goals{$_}";
+        print "  $_:\n$goals{$_}\n";
     } else {
-        $tmpIndent = " " x (2 + length);
+        $tmpIndent = " " x (3 + length);
         $goals{$_} =~ s/^$tmpIndent//;
-        print "  $_$goals{$_}";
+        print "  $_:$goals{$_}\n";
     }
 }
